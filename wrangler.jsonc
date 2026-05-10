@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sveltekit-vite-ts-tailwind-cloudflare",
+  "compatibility_date": "2026-05-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  }
+  // Uncomment and fill in to enable D1 (Drizzle is preinstalled):
+  // "d1_databases": [
+  //   {
+  //     "binding": "DB",
+  //     "database_name": "my-database",
+  //     "database_id": "<your-d1-database-id>",
+  //     "migrations_dir": "drizzle"
+  //   }
+  // ]
+}
