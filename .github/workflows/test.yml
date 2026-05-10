@@ -29,3 +29,6 @@ jobs:
 
       - name: lint 🧹
         run: npm run lint
+
+      - name: check 🔎
+        run: npm run check

@@ -1,18 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "sveltekit-vite-ts-tailwind-cloudflare",
+  "name": "sveltekit-starter",
   "compatibility_date": "2026-05-10",
   "compatibility_flags": ["nodejs_compat"],
-  "observability": {
-    "enabled": true
-  }
-  // Uncomment and fill in to enable D1 (Drizzle is preinstalled):
+  "pages_build_output_dir": ".svelte-kit/cloudflare"
+  // Production bindings (D1, KV, env vars, custom domains) are managed by
+  // Terraform (cloudflare-pages repo). Add local dev bindings here only if
+  // you need them for `npm run preview`. Example:
   // "d1_databases": [
-  //   {
-  //     "binding": "DB",
-  //     "database_name": "my-database",
-  //     "database_id": "<your-d1-database-id>",
-  //     "migrations_dir": "drizzle"
-  //   }
+  //   { "binding": "DB", "database_name": "sveltekit-starter", "database_id": "local" }
   // ]
 }
