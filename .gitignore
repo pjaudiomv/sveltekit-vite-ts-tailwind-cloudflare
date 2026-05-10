@@ -35,3 +35,6 @@ drizzle/.snapshots
 # Cloudflare secrets
 .dev.vars
 .dev.vars.local
+
+# Personal Claude context (deployment specifics)
+CLAUDE.md

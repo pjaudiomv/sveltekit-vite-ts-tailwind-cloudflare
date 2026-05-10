@@ -1,51 +1,89 @@
 # sveltekit-vite-ts-tailwind-cloudflare
 
-A minimalist SvelteKit starter template for **Cloudflare Pages**, using `@sveltejs/adapter-cloudflare`. Production infra (Pages project, custom domain, D1/KV bindings, env vars, Access policies) is managed by Terraform in [`pjaudiomv/cloudflare-pages`](https://github.com/pjaudiomv/cloudflare-pages); pushes to `main` auto-deploy via the Pages GitHub integration set up there.
+A minimalist SvelteKit starter template for **Cloudflare Pages**, with everything you'd want from a fresh project pre-wired and nothing you wouldn't.
 
-**Stack:** SvelteKit 2 · Svelte 5 · Vite 8 · TypeScript · Tailwind CSS v4 · shadcn-svelte · Drizzle ORM (D1-ready)
+**Stack:** SvelteKit 2 · Svelte 5 · Vite 8 · TypeScript · Tailwind CSS v4 · shadcn-svelte · Drizzle ORM (D1-ready) · `@sveltejs/adapter-cloudflare`
+
+## Use as a template
+
+Click **Use this template** on GitHub, or:
+
+```bash
+npx degit pjaudiomv/sveltekit-vite-ts-tailwind-cloudflare my-app
+cd my-app
+npm install
+npm run dev
+```
 
 ## Quick start
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173 — Vite + miniflare-emulated bindings
+npm run dev          # Vite dev server, http://localhost:5173
 npm run preview      # build + wrangler pages dev (real workerd runtime)
+npm run deploy       # build + wrangler pages deploy
 ```
 
 ## What's included
 
-- ✅ SvelteKit + `@sveltejs/adapter-cloudflare` (Pages output)
-- ✅ Workers runtime parity locally via `wrangler pages dev` (`npm run preview`)
-- ✅ Tailwind v4 via `@tailwindcss/vite`
+- ✅ SvelteKit 2 + Svelte 5 (runes + snippets)
+- ✅ `@sveltejs/adapter-cloudflare` → Pages output at `.svelte-kit/cloudflare`
+- ✅ Workers runtime parity locally via `wrangler pages dev`
+- ✅ Tailwind CSS v4 via `@tailwindcss/vite`
 - ✅ shadcn-svelte preconfigured (`components.json`, `cn()` helper, `Button` seeded)
 - ✅ `@lucide/svelte` icons
-- ✅ Drizzle ORM + drizzle-kit, D1 dialect, schema stub
+- ✅ Drizzle ORM + drizzle-kit, D1 (SQLite) dialect, schema stub
 - ✅ ESLint flat config + Prettier + svelte-check
-- ✅ GitHub Actions: lint + check on PRs (deploys are Terraform-driven, not GH Actions)
-- ✅ Renovate for grouped weekly dep updates
+- ✅ GitHub Actions: lint + check on PRs
+- ✅ Renovate for grouped weekly dependency updates
 - ✅ Hello-world API at `/api/hello` (`src/routes/api/hello/+server.ts`)
+- ✅ `.nvmrc` pinned to Node 22 to match Cloudflare's builder
 
-## Deploy
+## Deploy to Cloudflare Pages
 
-Pushes to `main` auto-deploy through the Cloudflare Pages → GitHub integration that the [`cloudflare-pages`](https://github.com/pjaudiomv/cloudflare-pages) Terraform repo provisions. PRs get preview deployments automatically.
+Two options:
 
-To configure or change production bindings (D1, KV, env vars, custom domain, Access), edit this app's block in `terraform/terraform.tfvars` over there and `terraform apply` — not this `wrangler.jsonc`.
+**A) Connect the repo in the Cloudflare dashboard** (zero-config; preview URLs per PR)
 
-Manual fallback: `npm run deploy` runs `wrangler pages deploy` if you need to push out of band.
+- Build command: `npm run build`
+- Build output directory: `.svelte-kit/cloudflare`
+- Set compatibility flag `nodejs_compat`
+- Push to `main` to deploy
 
-## Add a shadcn component
+**B) Manual / CI deploy with Wrangler**
+
+```bash
+wrangler login
+npm run deploy        # vite build && wrangler pages deploy
+```
+
+For GitHub Actions, you'd add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repo secrets and a workflow that runs `wrangler pages deploy` on push to `main`. (None included by default — pick whichever flow suits your team.)
+
+## Add a shadcn-svelte component
 
 ```bash
 npx shadcn-svelte@latest add card dialog dropdown-menu
 ```
 
+Components install into `src/lib/components/ui/` per `components.json`.
+
 ## Wire up D1 + Drizzle
 
-1. Add `d1_databases = ["DB"]` to this app's tfvars block in `cloudflare-pages` and `terraform apply`.
-2. Define tables in `src/lib/server/db/schema.ts`.
-3. `npm run db:generate` then `npm run db:migrate:local` (and `:migrate:remote` for prod).
+```bash
+wrangler d1 create my-database          # copy database_id into wrangler.jsonc
+# uncomment the d1_databases block in wrangler.jsonc
+```
 
-Then in a server route:
+Then:
+
+```bash
+# edit src/lib/server/db/schema.ts to add tables
+npm run db:generate                     # produces SQL in ./drizzle
+npm run db:migrate:local                # apply to local Miniflare D1
+npm run db:migrate:remote               # apply to deployed D1
+```
+
+In a server route:
 
 ```ts
 import { json } from '@sveltejs/kit';
@@ -58,6 +96,33 @@ export const GET: RequestHandler = async ({ platform }) => {
   return json({ ok: true });
 };
 ```
+
+## Project layout
+
+```
+src/
+  lib/
+    components/ui/       # shadcn-svelte components
+    server/db/           # Drizzle schema + db client
+    utils.ts             # cn() helper
+  routes/
+    +layout.svelte       # imports app.css
+    +page.svelte         # demo page
+    api/hello/+server.ts # JSON API route
+  app.html
+  app.css                # Tailwind + theme tokens (light/dark)
+  app.d.ts               # App.Platform typed with Cloudflare env
+static/                  # served as-is
+wrangler.jsonc           # Cloudflare config
+svelte.config.js
+vite.config.ts
+drizzle.config.ts
+components.json
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
