@@ -28,7 +28,7 @@ export default [
     }
   },
   {
-    ignores: ['build/', 'dist/', '.svelte-kit/', '.wrangler/', 'drizzle/', '*.md']
+    ignores: ['build/', 'dist/', '.svelte-kit/', '.wrangler/', 'drizzle/', '*.md', 'worker-configuration.d.ts']
   },
   {
     files: ['**/*.ts', '**/*.svelte'],
